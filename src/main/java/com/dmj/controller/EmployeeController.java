@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -29,6 +30,7 @@ public class EmployeeController {
         return "emp/list";
     }
 
+    //跳转员工添加页面
     @GetMapping("/emp")
     public String toAddpage(Model model){
         //查出所有部门信息
@@ -36,7 +38,7 @@ public class EmployeeController {
         model.addAttribute("departments",departments);
         return "emp/add";
     }
-
+    //添加请求
     @PostMapping("/emp")
     public String addEmp(Employee employee){
         System.out.println("save==>"+employee);
@@ -46,9 +48,28 @@ public class EmployeeController {
     }
 
     //跳转员工修改页面
-    @GetMapping("")
-    public String toUpdateEmp(){
+    @GetMapping("/emp/{id}")
+    public String toUpdateEmp(@PathVariable("id")Integer id, Model model){
         //查出原来的数据
+        Employee employee = employeeMapper.getEmployeeById(id);
+        model.addAttribute("emp",employee);//查出来后返回前端页面
+        //查询所有部门信息
+        Collection<Department> departments = departmentMapper.getDepartments();
+        model.addAttribute("departments",departments);
         return "emp/update";
+    }
+    //修改请求
+    @PostMapping("/updateEmp")
+    public String updateEmp(Employee employee){
+        System.out.println("save==>"+employee);
+        employeeMapper.save(employee);
+        return "redirect:/emps";
+    }
+
+    //删除员工
+    @GetMapping("/deleteEmp/{id}")
+    public String deleteEmp(@PathVariable("id")Integer id){
+        employeeMapper.delete(id);
+        return "redirect:/emps";
     }
 }
